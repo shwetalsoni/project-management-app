@@ -20,41 +20,54 @@ datasource db {
 // user - id, email, passwordHash, createdAt
 // userProjects - user_id, project_id, createdAt
 
-model Projects {
-    id          Int            @id @default(autoincrement())
-    creator     User           @relation(fields: [creatorId], references: [id])
+model Project {
+    id          Int           @id @default(autoincrement())
+    creator     User          @relation(fields: [creatorId], references: [id])
     creatorId   String
-    createdAt   DateTime       @default(now())
+    createdAt   DateTime      @default(now())
     description String
-    members     UserProjects[]
+    members     UserProject[]
+    title       String
+    tasks       Task[]
 }
 
 model User {
-    id              String         @id @default(cuid())
-    name            String
-    email           String         @unique
-    emailVerified   Boolean        @default(false)
-    projectsCreated Projects[]
-    tasksAssigned   Tasks[]
-    projects        UserProjects[]
+    id              String        @id @default(cuid())
+    email           String        @unique
+    passwordHash    String
+    projectsCreated Project[]
+    tasksAssigned   Task[]        @relation("taskAssignee")
+    projects        UserProject[]
+    tasksCreated    Task[]        @relation("taskCreator")
 }
 
-model Tasks {
+enum Status {
+    TODO
+    DOING
+    DONE
+}
+
+model Task {
     id          Int      @id @default(autoincrement())
     title       String
     description String
     tags        String[]
     createdAt   DateTime @default(now())
+    creator     User     @relation("taskCreator", fields: [creatorId], references: [id])
+    creatorId   String
     deadline    DateTime
-    assignee    User     @relation(fields: [assigneeId], references: [id])
+    assignee    User?    @relation("taskAssignee", fields: [assigneeId], references: [id])
     assigneeId  String
+    status      Status   @default(TODO)
+    project     Project  @relation(fields: [projectId], references: [id])
+    projectId   Int
 }
 
-model UserProjects {
+model UserProject {
     id        Int      @id @default(autoincrement())
     user      User     @relation(fields: [userId], references: [id])
     userId    String
-    project   Projects @relation(fields: [projectId], references: [id])
+    project   Project  @relation(fields: [projectId], references: [id])
     projectId Int
     createdAt DateTime @default(now())
 }

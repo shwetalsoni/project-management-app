@@ -6,9 +6,11 @@ import {
   type NextAuthOptions,
 } from "next-auth";
 import { type Adapter } from "next-auth/adapters";
+import CredentialsProvider from "next-auth/providers/credentials";
 
 import { env } from "@/env";
-import { db } from "@/server/db";
+import db from "@/server/db";
+import bcrypt from "bcrypt";
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -38,16 +40,57 @@ declare module "next-auth" {
  */
 export const authOptions: NextAuthOptions = {
   callbacks: {
-    session: ({ session, user }) => ({
-      ...session,
-      user: {
-        ...session.user,
-        id: user.id,
-      },
-    }),
+    session: async ({ session }) => {
+      const user = await db.user.findUniqueOrThrow({
+        where: { email: session.user.email ?? "" },
+      });
+      console.log("session event:", session, user);
+      return {
+        ...session,
+        user: {
+          ...session.user,
+          id: user.id,
+        },
+      };
+    },
+  },
+  session: {
+    strategy: "jwt",
   },
   adapter: PrismaAdapter(db) as Adapter,
   providers: [
+    CredentialsProvider({
+      // The name to display on the sign in form (e.g. "Sign in with...")
+      name: "Email and Password",
+      // `credentials` is used to generate a form on the sign in page.
+      // You can specify which fields should be submitted, by adding keys to the `credentials` object.
+      // e.g. domain, username, password, 2FA token, etc.
+      // You can pass any HTML attribute to the <input> tag through the object.
+      credentials: {
+        email: { label: "Email", type: "email" },
+        // username: { label: "Username", type: "text", placeholder: "email" },
+        password: { label: "Password", type: "password" },
+      },
+      async authorize(credentials, req) {
+        // Add logic here to look up the user from the credentials supplied
+        if (!credentials) return null;
+        const user = await db.user.findUnique({
+          where: { email: credentials.email },
+        });
+        if (!user) return null;
+
+        const isValid = await bcrypt.compare(
+          credentials.password,
+          user.passwordHash,
+        );
+        if (!isValid) return null;
+
+        return {
+          id: user.id,
+          email: user.email,
+        };
+      },
+    }),
     /**
      * ...add more providers here.
      *
