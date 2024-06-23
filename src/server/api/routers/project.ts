@@ -5,8 +5,6 @@
 // get project
 // get user's all projects
 
-// note - add check that user is member of project
-
 import { z } from "zod";
 
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
@@ -20,8 +18,23 @@ export const projectRouter = createTRPCRouter({
     )
     .query(async ({ ctx, input }) => {
       return ctx.db.project.findUniqueOrThrow({
-        where: { id: input.id },
-        include: { tasks: true },
+        where: {
+          id: input.id,
+          members: { some: { userId: ctx.session.user.id } },
+        },
+        include: {
+          tasks: {
+            include: {
+              assignee: {
+                select: {
+                  id: true,
+                  email: true,
+                  username: true,
+                },
+              },
+            },
+          },
+        },
       });
     }),
 
@@ -36,7 +49,7 @@ export const projectRouter = createTRPCRouter({
   create: protectedProcedure
     .input(
       z.object({
-        title: z.string().max(10),
+        title: z.string(),
         description: z.string(),
       }),
     )
@@ -62,28 +75,79 @@ export const projectRouter = createTRPCRouter({
       };
     }),
 
-  addMember: protectedProcedure
+  update: protectedProcedure
     .input(
       z.object({
-        id: z.number(),
-        memberId: z.string(),
+        projectId: z.number(),
+        title: z.string(),
+        description: z.string(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const project = await ctx.db.project.findUniqueOrThrow({
-        where: { id: input.id },
+      const project = await ctx.db.project.update({
+        where: { id: input.projectId },
+        data: {
+          title: input.title,
+          description: input.description,
+        },
       });
+      return {
+        success: true,
+        data: {
+          project,
+          message: "Project updated successfully.",
+        },
+      };
+    }),
 
-      if (!project) {
-        throw new Error("Project not found");
-      }
+  getMember: protectedProcedure
+    .input(
+      z.object({
+        id: z.number(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const project = await ctx.db.project.findUniqueOrThrow({
+        where: {
+          id: input.id,
+          members: { some: { userId: ctx.session.user.id } },
+        },
+        select: {
+          members: {
+            select: {
+              user: { select: { email: true, id: true, username: true } },
+            },
+          },
+        },
+      });
+      return project.members.map((member) => member.user);
+    }),
 
+  addMember: protectedProcedure
+    .input(
+      z.object({
+        projectId: z.number(),
+        email: z.string(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
       await ctx.db.project.update({
-        where: { id: input.id },
+        where: {
+          id: input.projectId,
+          members: { some: { userId: ctx.session.user.id } },
+        },
         data: {
           members: {
             create: {
-              userId: input.memberId,
+              user: {
+                connectOrCreate: {
+                  where: { email: input.email },
+                  create: {
+                    email: input.email,
+                    username: input.email.split("@")[0],
+                  },
+                },
+              },
             },
           },
         },
@@ -104,20 +168,10 @@ export const projectRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const project = await ctx.db.project.findUniqueOrThrow({
-        where: {
-          id: input.id,
-          members: { some: { userId: ctx.session.user.id } },
-        },
-      });
-
-      if (!project) {
-        throw new Error("Only members can delete project");
-      }
-
       await ctx.db.project.delete({
         where: {
           id: input.id,
+          members: { some: { userId: ctx.session.user.id } },
         },
       });
       return {

@@ -1,11 +1,7 @@
 import { z } from "zod";
 import bcrypt from "bcrypt";
 
-import {
-  createTRPCRouter,
-  protectedProcedure,
-  publicProcedure,
-} from "@/server/api/trpc";
+import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
 
 export const signUpRouter = createTRPCRouter({
   create: publicProcedure
@@ -19,17 +15,30 @@ export const signUpRouter = createTRPCRouter({
       const existingUser = await ctx.db.user.findUnique({
         where: { email: input.email },
       });
-      if (existingUser) {
+
+      if (!!existingUser && !!existingUser.passwordHash) {
         throw new Error("User already exists");
       }
       const salt = await bcrypt.genSalt(10);
+
       const passwordHash = await bcrypt.hash(input.password, salt);
-      const user = await ctx.db.user.create({
-        data: {
-          email: input.email,
-          passwordHash,
-        },
-      });
+
+      if (existingUser) {
+        await ctx.db.user.update({
+          where: { email: input.email },
+          data: {
+            passwordHash,
+          },
+        });
+      } else {
+        await ctx.db.user.create({
+          data: {
+            email: input.email,
+            passwordHash,
+            username: input.email.split("@")[0],
+          },
+        });
+      }
       return {
         success: true,
         data: {

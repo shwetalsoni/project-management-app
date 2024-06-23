@@ -1,7 +1,8 @@
 import { type Config } from "tailwindcss";
-import { fontFamily } from "tailwindcss/defaultTheme";
+import theme, { fontFamily } from "tailwindcss/defaultTheme";
 
 export default {
+  darkMode: "class",
   content: ["./src/**/*.tsx"],
   theme: {
     extend: {
@@ -11,4 +12,8 @@ export default {
     },
   },
   plugins: [require("daisyui")],
+  daisyui: {
+    theme: ["light"],
+    logs: false,
+  },
 } satisfies Config;

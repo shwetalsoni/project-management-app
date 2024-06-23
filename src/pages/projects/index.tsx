@@ -1,9 +1,47 @@
+import Button from "@/components/Button";
 import ProjectCard from "@/components/ProjectCard";
-import SignOut from "@/components/SignOut";
+import { api } from "@/utils/api";
+import { useSession } from "next-auth/react";
 import Head from "next/head";
-import Link from "next/link";
+import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
+import { MdEdit } from "react-icons/md";
+import { toast } from "react-toastify";
 
 export default function Projects() {
+  const router = useRouter();
+  const { data: sessionData } = useSession();
+
+  const { data: projects } = api.projects.getUserAllProjects.useQuery();
+  const updateUsername = api.users.update.useMutation();
+
+  const [username, setUsername] = useState<string>("");
+
+  useEffect(() => {
+    if (!sessionData) return;
+    setUsername(sessionData?.user.username);
+  }, [sessionData]);
+
+  const handleUsernameChange = async () => {
+    const toastId = toast("Updating username", { isLoading: true });
+    document.getElementById("username_modal").close();
+    await updateUsername.mutateAsync({ username }).catch(() => {
+      toast.update(toastId, {
+        render: "Error occured",
+        isLoading: false,
+        type: "error",
+        autoClose: 5000,
+      });
+    });
+
+    toast.update(toastId, {
+      render: "Username updated successfully",
+      isLoading: false,
+      type: "success",
+      autoClose: 5000,
+    });
+  };
+
   return (
     <>
       <Head>
@@ -14,21 +52,65 @@ export default function Projects() {
         />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className=" justify-left flex min-h-screen flex-col bg-white px-28 py-16">
-        <div className="mb-10 flex items-center">
-          <h1 className="flex-1 text-2xl font-medium">My Projects</h1>
-          <button className="mr-5 rounded-full bg-cyan-700 px-5 py-2 text-white">
-            Create Project
-          </button>
-          <SignOut />
-        </div>
-        {/* show created projects */}
-        <div className="flex flex-wrap gap-6">
-          {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-            <div key={i}>
-              <ProjectCard />
+      <main className="flex flex-1 flex-col bg-white px-28 py-10 ">
+        {/* set username modal */}
+        <dialog id="username_modal" className="modal">
+          <div className="modal-box bg-white">
+            <h3 className="mb-3 text-lg font-bold text-gray-700">
+              Set username
+            </h3>
+            <input
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              className="mb-5 w-full rounded-md border bg-white p-2"
+            />
+            <Button variant="primary" onClick={handleUsernameChange}>
+              Submit
+            </Button>
+          </div>
+          <form method="dialog" className="modal-backdrop">
+            <button>close</button>
+          </form>
+        </dialog>
+        <div className="mb-10 flex flex-col items-center justify-center gap-5 sm:flex-row sm:justify-start">
+          <div className="flex flex-1 items-center gap-2">
+            <h1 className="text-center text-4xl font-medium text-cyan-800 sm:text-left">
+              Hi {username}
+            </h1>
+            <div
+              onClick={() =>
+                document.getElementById("username_modal").showModal()
+              }
+              className="cursor-pointer"
+            >
+              <MdEdit size={25} />
             </div>
-          ))}
+          </div>
+
+          <Button
+            variant="primary"
+            onClick={() => void router.push("/projects/createProject")}
+          >
+            Create Project
+          </Button>
+        </div>
+        <h3 className="mb-8 text-xl font-semibold text-gray-600">
+          Projects Created
+        </h3>
+
+        {/* show created projects */}
+        <div className="flex flex-wrap justify-center gap-6 md:justify-start">
+          {!!projects &&
+            projects.map((project, i) => (
+              <div key={i}>
+                <ProjectCard
+                  id={project.id}
+                  title={project.title}
+                  description={project.description}
+                />
+              </div>
+            ))}
         </div>
       </main>
     </>

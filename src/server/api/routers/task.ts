@@ -21,11 +21,21 @@ export const taskRouter = createTRPCRouter({
     .input(
       z.object({
         taskId: z.number(),
+        projectId: z.number(),
       }),
     )
     .query(async ({ ctx, input }) => {
       return ctx.db.task.findUniqueOrThrow({
-        where: { id: input.taskId },
+        where: {
+          id: input.taskId,
+          projectId: input.projectId,
+          project: {
+            members: { some: { userId: ctx.session.user.id } },
+          },
+        },
+        include: {
+          assignee: { select: { email: true, username: true, id: true } },
+        },
       });
     }),
 
@@ -33,7 +43,7 @@ export const taskRouter = createTRPCRouter({
     .input(
       z.object({
         projectId: z.number(),
-        title: z.string().max(10),
+        title: z.string(),
         description: z.string(),
         tags: z.array(z.string()),
         deadline: z.date(),
@@ -51,6 +61,7 @@ export const taskRouter = createTRPCRouter({
       if (!project) {
         throw new Error("Project not found");
       }
+      console.log("Creating task", input, ctx.session.user.id);
 
       const task = await ctx.db.task.create({
         data: {
@@ -59,8 +70,8 @@ export const taskRouter = createTRPCRouter({
           description: input.description,
           tags: input.tags,
           deadline: input.deadline,
-          assigneeId: input.assigneeId,
           creatorId: ctx.session.user.id,
+          assigneeId: !!input.assigneeId ? input.assigneeId : undefined,
         },
       });
       return {
@@ -84,8 +95,11 @@ export const taskRouter = createTRPCRouter({
         assigneeId: z.string(),
       }),
     )
+
     .mutation(async ({ ctx, input }) => {
-      const _task = await ctx.db.task.findUniqueOrThrow({
+      console.log("Creating task", input, ctx.session.user.id);
+
+      const task = await ctx.db.task.update({
         where: {
           id: input.taskId,
           projectId: input.projectId,
@@ -93,23 +107,13 @@ export const taskRouter = createTRPCRouter({
             members: { some: { userId: ctx.session.user.id } },
           },
         },
-      });
 
-      if (!_task) {
-        throw new Error("Task not found or user is invalid");
-      }
-
-      const task = await ctx.db.task.update({
-        where: {
-          id: input.taskId,
-          projectId: input.projectId,
-        },
         data: {
           title: input.title,
           description: input.description,
           tags: input.tags,
           deadline: input.deadline,
-          assigneeId: input.assigneeId,
+          assigneeId: !!input.assigneeId ? input.assigneeId : undefined,
         },
       });
 
@@ -135,6 +139,9 @@ export const taskRouter = createTRPCRouter({
         where: {
           id: input.taskId,
           projectId: input.projectId,
+          project: {
+            members: { some: { userId: ctx.session.user.id } },
+          },
         },
         data: {
           status: input.status,
@@ -143,7 +150,7 @@ export const taskRouter = createTRPCRouter({
       return {
         success: true,
         data: {
-          message: "Task deleted.",
+          message: "Task status updated",
         },
       };
     }),
@@ -152,12 +159,17 @@ export const taskRouter = createTRPCRouter({
     .input(
       z.object({
         taskId: z.number(),
+        projectId: z.number(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      await ctx.db.project.delete({
+      await ctx.db.task.delete({
         where: {
           id: input.taskId,
+          projectId: input.projectId,
+          project: {
+            members: { some: { userId: ctx.session.user.id } },
+          },
         },
       });
       return {

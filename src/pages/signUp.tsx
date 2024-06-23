@@ -2,6 +2,7 @@ import type { FormEvent } from "react";
 import { useRouter } from "next/router";
 
 import { api } from "@/utils/api";
+import { toast } from "react-toastify";
 
 export default function SignUp() {
   const router = useRouter();
@@ -18,17 +19,15 @@ export default function SignUp() {
       return;
     }
 
-    const res = await mutation.mutateAsync({ email, password });
-
-    if (res.success) {
-      void router.push("/");
-    } else {
-      alert("Error occured");
-    }
+    const res = await mutation.mutateAsync({ email, password }).catch((err) => {
+      toast.error(err.message);
+    });
+    if (!res) return;
+    void router.push("/");
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-white">
+    <div className="flex items-center justify-center bg-white">
       <form onSubmit={handleSubmit} className="flex min-w-32 flex-col gap-4">
         <input
           className="w-60 rounded-md border border-gray-400 bg-white p-2 text-gray-800"

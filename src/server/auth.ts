@@ -44,12 +44,13 @@ export const authOptions: NextAuthOptions = {
       const user = await db.user.findUniqueOrThrow({
         where: { email: session.user.email ?? "" },
       });
-      console.log("session event:", session, user);
+      // console.log("session event:", session, user);
       return {
         ...session,
         user: {
           ...session.user,
           id: user.id,
+          username: user.username,
         },
       };
     },
@@ -88,6 +89,7 @@ export const authOptions: NextAuthOptions = {
         return {
           id: user.id,
           email: user.email,
+          username: user.username,
         };
       },
     }),
