@@ -146,7 +146,29 @@ The app contains 4 api routes in total among which 3 are protectedProcedures(for
    - Returns - `userId`
 
 ### Invite Members Flow
+For adding member to project, `email-id` is used. It creates new user with the given `email`, while `password` and `username` are set to null.
+Therefore the added user can sign in with their `email`, and create a password, which will lead to user `update`. After signing in, user can set their `username` from the dashboard.
 
 ## Testing
+For testing [vitest](https://vitest.dev/) is being used.
+- Added `vitest.config.ts`. Refer to [https://vitest.dev/config/](https://vitest.dev/config/) for configuring vitest.
+- Configured path in vitest config file, to use test environment.
+- Spinned up a local database by running `start-database.sh` which is generated while creating our t3 stack app.
+- Created a `unit.test.ts` file.
+- Using `createInnerTRPCContext` so we don't have to mock Next.js' req/res.
+- For creating user session, `Session` type is being imported from `next-auth`.
+- Now for tests:
+   - For creating test user, `signUp` api need to be called, which is a publicProcedure.
+      - Before calling API, context and caller are created without session.
+      - Once test user is signed up, session can be generated using user id.
+        
+Following are the tests done on API:
+1. Creating a project when user is not signed in. (Throws error)
+2. Creating project when user is signed in. (Return project object)
+3. Creating a task by a user who is not a member of project. (Throws error)
+4. Creating a task by member of project. (Return task object)
+5. Deleting a task by a user who is not a member of project. (Throws error)
+6. Deleting a task by a member of project (Returns success message)
 
+  
 ## Deployment instructions
