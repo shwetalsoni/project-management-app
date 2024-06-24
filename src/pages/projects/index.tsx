@@ -73,9 +73,9 @@ export default function Projects() {
             <button>close</button>
           </form>
         </dialog>
-        <div className="mb-10 flex flex-col items-center justify-center gap-5 sm:flex-row sm:justify-start">
-          <div className="flex flex-1 items-center gap-2">
-            <h1 className="text-center text-4xl font-medium text-cyan-800 sm:text-left">
+        <div className="mb-10 flex flex-col items-center justify-center gap-5 sm:flex-row md:justify-start">
+          <div className="flex flex-1 flex-wrap items-center justify-center gap-2 sm:justify-start">
+            <h1 className="text-center text-2xl font-medium text-cyan-800 sm:text-left sm:text-4xl">
               Hi {username}
             </h1>
             <div
@@ -95,7 +95,7 @@ export default function Projects() {
             Create Project
           </Button>
         </div>
-        <h3 className="mb-8 text-xl font-semibold text-gray-600">
+        <h3 className="mb-8 text-center text-xl font-semibold text-gray-600 md:text-left">
           Projects Created
         </h3>
 

@@ -23,15 +23,17 @@ export const signUpRouter = createTRPCRouter({
 
       const passwordHash = await bcrypt.hash(input.password, salt);
 
+      let user;
+
       if (existingUser) {
-        await ctx.db.user.update({
+        user = await ctx.db.user.update({
           where: { email: input.email },
           data: {
             passwordHash,
           },
         });
       } else {
-        await ctx.db.user.create({
+        user = await ctx.db.user.create({
           data: {
             email: input.email,
             passwordHash,
@@ -39,9 +41,12 @@ export const signUpRouter = createTRPCRouter({
           },
         });
       }
+
+      const userId = user.id;
       return {
         success: true,
         data: {
+          userId,
           message: "Account created successfully. Now sign in to continue.",
         },
       };

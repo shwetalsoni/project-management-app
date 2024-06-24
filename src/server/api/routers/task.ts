@@ -61,7 +61,6 @@ export const taskRouter = createTRPCRouter({
       if (!project) {
         throw new Error("Project not found");
       }
-      console.log("Creating task", input, ctx.session.user.id);
 
       const task = await ctx.db.task.create({
         data: {

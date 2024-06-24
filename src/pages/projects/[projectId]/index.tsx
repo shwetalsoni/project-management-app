@@ -100,7 +100,7 @@ const Tasks = () => {
 
         {/* filters */}
 
-        <div className="mb-10 flex items-center gap-5">
+        <div className="mb-10 flex flex-wrap items-center gap-5">
           {/* status filter */}
           <div className="flex items-center gap-3">
             <div>Status</div>
