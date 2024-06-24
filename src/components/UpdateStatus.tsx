@@ -35,7 +35,7 @@ const UpdateStatus = ({
       {dropdownOpen && (
         <ul
           tabIndex={0}
-          className="menu dropdown-content z-[1] w-52 rounded-box p-2 shadow"
+          className="menu dropdown-content z-50 w-52 rounded-box bg-gray-50 p-2 shadow"
         >
           <li onClick={() => handleUpdateStatus("TODO")}>
             <a>TODO</a>

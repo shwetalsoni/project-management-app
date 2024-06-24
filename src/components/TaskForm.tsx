@@ -149,7 +149,7 @@ const TaskForm = ({
                   >
                     Tags
                   </label>
-                  <div className="flex flex-wrap items-center gap-3">
+                  <div className="mb-3 flex flex-wrap items-center gap-3">
                     {values.tags.length > 0 &&
                       values.tags.map((tag, index) => (
                         <div key={index}>

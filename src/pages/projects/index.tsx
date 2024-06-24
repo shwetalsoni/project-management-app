@@ -101,6 +101,9 @@ export default function Projects() {
 
         {/* show created projects */}
         <div className="flex flex-wrap justify-center gap-6 md:justify-start">
+          {projects?.length === 0 && (
+            <p className="text-center">No projects created yet.</p>
+          )}
           {!!projects &&
             projects.map((project, i) => (
               <div key={i}>
