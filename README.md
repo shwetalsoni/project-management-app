@@ -63,7 +63,87 @@
 - User can change task status by clicking on pencil icon beside task status.
 
 ### API architecture
+The app contains 4 api routes in total among which 3 are protectedProcedures(for authenticated users only), and one publicProcedure for un-authenticated users.
 
+**Protected Procedures**
+#### project router
+- ```get```
+   - Params - `projecId`
+   - Condition - User calling api should be member of the project.
+   - Returns - Project details, including all its tasks assigneeId(to filter tasks assigned to signed in user).
+     
+- ```getUserAllProjects```
+   - Params - None
+   - Condition - User calling api should be member of the project.
+   - Returns - All projects that satisfies above condition.
+
+- ```create```
+   - Params - `title` `description`
+   - Condition - None
+   - Returns - The generated project
+
+- ```update```
+   - Params - `projectId` `title` `description`
+   - Condition - User calling api should be member of the project.
+   - Returns - Updated project.
+
+- ```delete```
+   - Params - `projectId`
+   - Condition - User calling api should be member of the project.
+   - Returns - Confirm message
+
+- ```getMember```
+   - Params - `projectId`
+   - Condition - User calling api should be member of the project.
+   - Returns - Members `email` `id` `username`.
+
+- ```addMember```
+   - Params - `projectId` `email`
+   - Condition - User calling api should be member of the project.
+   - Returns -  Confirm message
+
+
+#### task router
+- ```get```
+   - Params - `projecId` `taskId`
+   - Condition - User calling api should be member of the project.
+   - Returns - Task details, including assignee(to show all assignees while updating task).
+ 
+- ```create```
+   - Params - `projecId` `title` `description` `tags` `deadline` `assigneeId`
+   - Condition - User calling api should be member of the project.
+   - Returns - Created task
+
+- ```update```
+   - Params - `taskId` `projecId` `title` `description` `tags` `deadline` `assigneeId`
+   - Condition - User calling API should be member of the project.
+   - Returns - Updated task
+
+- ```updateStatus```
+   - Params - `taskId` `projecId` `status`
+   - Condition - User calling api should be member of the project.
+   - Returns - Confirm message
+ 
+- ```delete```
+   - Params - `taskId` `projecId`
+   - Condition - User calling api should be member of the project.
+   - Returns - Confirm message
+
+#### user router
+- ```update```
+   - Params - `username`
+   - Condition - Signed in user's id should match user id in db
+   - Returns - Updated user's `id` `email` `username`
+
+**Public Procedures**
+#### signUp router
+- ```create```
+   - Params - `email` `password`
+   - Condition - user with a `passwordHash` should not already exist.
+   - Flow:
+        - For an existing user with empty `passwordHash` field, `update` user with `passwordHash`.
+        - For new user, `create` user
+   - Returns - `userId`
 
 ### Invite Members Flow
 
