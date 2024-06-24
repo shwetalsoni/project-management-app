@@ -85,7 +85,10 @@ export const projectRouter = createTRPCRouter({
     )
     .mutation(async ({ ctx, input }) => {
       const project = await ctx.db.project.update({
-        where: { id: input.projectId },
+        where: {
+          id: input.projectId,
+          members: { some: { userId: ctx.session.user.id } },
+        },
         data: {
           title: input.title,
           description: input.description,

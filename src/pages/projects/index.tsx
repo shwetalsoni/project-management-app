@@ -90,7 +90,7 @@ export default function Projects() {
 
           <Button
             variant="primary"
-            onClick={() => void router.push("/projects/createProject")}
+            onClick={() => void router.push("/projects/create")}
           >
             Create Project
           </Button>

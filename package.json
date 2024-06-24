@@ -1,5 +1,5 @@
 {
-  "name": "project_management_app",
+  "name": "project-management-app",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -9,11 +9,11 @@
     "db:migrate": "prisma migrate deploy",
     "db:push": "prisma db push",
     "db:studio": "prisma studio",
-    "dev": "next dev",
-    "postinstall": "prisma generate",
+    "dev": "sst dev next dev",
     "lint": "next lint",
+    "postinstall": "prisma generate",
     "start": "next start",
-    "test": "env-cmd -f .env.test prisma db push --force-reset && vitest run"
+    "test": "env-cmd -f .env.test prisma db push --force-reset \u0026\u0026 vitest run"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^1.6.0",
@@ -39,6 +39,7 @@
     "react-dom": "^18.3.0",
     "react-icons": "^5.2.1",
     "react-toastify": "^10.0.5",
+    "sst": "ion",
     "superjson": "^2.2.1",
     "tailwind-merge": "^2.3.0",
     "zod": "^3.23.3"

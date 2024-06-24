@@ -38,5 +38,5 @@
     "**/*.js",
     ".next/types/**/*.ts"
 , "src/server/api/routers/unit.test.ts"  ],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules","sst.config.ts"]
 }

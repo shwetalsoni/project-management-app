@@ -16,10 +16,15 @@ export const userRouter = createTRPCRouter({
           username: input.username,
         },
       });
+      const _user = {
+        id: user.id,
+        email: user.email,
+        username: user.username,
+      };
       return {
         success: true,
         data: {
-          user,
+          _user,
           message: "User updated successfully.",
         },
       };
