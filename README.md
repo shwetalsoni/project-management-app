@@ -1,5 +1,8 @@
 # Task Management and Collaboration Tool 
 
+## Deployed link
+https://d1xsfqpmaij5qi.cloudfront.net/
+
 ## Table of content
 - [Project Setup](#project-setup)
 - [Architecture](#architecture)
