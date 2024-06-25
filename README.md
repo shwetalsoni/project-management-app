@@ -182,6 +182,4 @@ Following are the tests done on API:
 5. Deployed using `sst deploy`
 6. Fixed cross-platform architecture dependencies
    **Prisma** - ```binaryTargets = ["native", "rhel-openssl-3.0.x"]```. Added this to `schema.prisma`
-7. Setup github actions
-   - Added aws access keys to github secrets
-   - Created workflow yaml file to run the deploy workflow on every push on main branch
+
