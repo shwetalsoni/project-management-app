@@ -9,10 +9,12 @@
     "db:migrate": "prisma migrate deploy",
     "db:push": "prisma db push",
     "db:studio": "prisma studio",
-    "dev": "sst dev next dev",
+    "dev": "next dev",
+    "dev:sst": "sst dev next dev",
     "lint": "next lint",
     "postinstall": "prisma generate",
     "start": "next start",
+    "deploy": "sst deploy",
     "test": "env-cmd -f .env.test prisma db push --force-reset \u0026\u0026 vitest run"
   },
   "dependencies": {

@@ -37,7 +37,7 @@ export const signUpRouter = createTRPCRouter({
           data: {
             email: input.email,
             passwordHash,
-            username: input.email.split("@")[0],
+            username: input.email.split("@")[0] ?? input.email,
           },
         });
       }

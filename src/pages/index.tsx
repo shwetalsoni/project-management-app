@@ -1,6 +1,5 @@
 import { useEffect } from "react";
 import { signIn, useSession } from "next-auth/react";
-import SignOut from "@/components/SignOut";
 import Head from "next/head";
 import Link from "next/link";
 import Button from "@/components/Button";

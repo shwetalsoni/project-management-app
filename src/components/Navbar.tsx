@@ -3,16 +3,19 @@ import { signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import Button from "./Button";
 import Link from "next/link";
+import { api } from "@/utils/api";
 
 const Navbar = () => {
   const router = useRouter();
   const { data: sessionData } = useSession();
+  const utils = api.useUtils();
 
   const handleSignOut = async () => {
     console.log("signing out");
 
     await signOut();
     console.log("signed out");
+    await utils.invalidate();
     void router.push("/");
 
     console.log("pushed to /");

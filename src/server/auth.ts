@@ -8,7 +8,6 @@ import {
 import { type Adapter } from "next-auth/adapters";
 import CredentialsProvider from "next-auth/providers/credentials";
 
-import { env } from "@/env";
 import db from "@/server/db";
 import bcrypt from "bcrypt";
 
@@ -22,8 +21,8 @@ declare module "next-auth" {
   interface Session extends DefaultSession {
     user: DefaultSession["user"] & {
       id: string;
-      // ...other properties
-      // role: UserRole;
+      username: string;
+      email: string;
     };
   }
 
@@ -72,13 +71,13 @@ export const authOptions: NextAuthOptions = {
         // username: { label: "Username", type: "text", placeholder: "email" },
         password: { label: "Password", type: "password" },
       },
-      async authorize(credentials, req) {
+      async authorize(credentials) {
         // Add logic here to look up the user from the credentials supplied
         if (!credentials) return null;
         const user = await db.user.findUnique({
           where: { email: credentials.email },
         });
-        if (!user) return null;
+        if (!user?.passwordHash) return null;
 
         const isValid = await bcrypt.compare(
           credentials.password,

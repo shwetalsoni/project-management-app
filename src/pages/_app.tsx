@@ -6,15 +6,25 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Navbar from "@/components/Navbar";
 import clsx from "clsx";
+import { useRouter } from "next/router";
 
 import { api } from "@/utils/api";
 
 import "@/styles/globals.css";
+import { useEffect } from "react";
 
 const MyApp: AppType<{ session: Session | null }> = ({
   Component,
   pageProps: { session, ...pageProps },
 }) => {
+  const router = useRouter();
+
+  useEffect(() => {
+    if (session) return;
+    if (router.pathname === "/" || router.pathname === "/signUp") return;
+    void router.push("/");
+  }, [session]);
+
   return (
     <SessionProvider session={session}>
       <ToastContainer />

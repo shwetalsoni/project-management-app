@@ -19,9 +19,11 @@ export default function SignUp() {
       return;
     }
 
-    const res = await mutation.mutateAsync({ email, password }).catch((err) => {
-      toast.error(err.message);
-    });
+    const res = await mutation
+      .mutateAsync({ email, password })
+      .catch((err: { message: string }) => {
+        toast.error(err.message);
+      });
     if (!res) return;
     void router.push("/");
   }

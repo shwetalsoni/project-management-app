@@ -147,7 +147,7 @@ export const projectRouter = createTRPCRouter({
                   where: { email: input.email },
                   create: {
                     email: input.email,
-                    username: input.email.split("@")[0],
+                    username: input.email.split("@")[0] ?? input.email,
                   },
                 },
               },

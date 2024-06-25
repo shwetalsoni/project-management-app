@@ -178,12 +178,12 @@ const TaskForm = ({
                   </div>
 
                   <div className=" flex flex-col items-start">
-                    <Field
+                    <input
                       className="input input-bordered mb-3 w-full bg-white text-gray-700 placeholder:text-sm"
                       placeholder="Enter tag"
                       type="text"
                       value={currentTag}
-                      onChange={(e) => setCurrentTag(e.target.value as string)}
+                      onChange={(e) => setCurrentTag(e.target.value)}
                     />
                     <button
                       type="button"

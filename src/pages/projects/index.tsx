@@ -24,7 +24,9 @@ export default function Projects() {
 
   const handleUsernameChange = async () => {
     const toastId = toast("Updating username", { isLoading: true });
-    document.getElementById("username_modal").close();
+    const modal = document.getElementById("username_modal");
+    // @ts-expect-error: Let's ignore a compile error
+    if (modal) modal.close?.(); // eslint-disable-line
     await updateUsername.mutateAsync({ username }).catch(() => {
       toast.update(toastId, {
         render: "Error occured",
@@ -79,8 +81,10 @@ export default function Projects() {
               Hi {username}
             </h1>
             <div
-              onClick={() =>
-                document.getElementById("username_modal").showModal()
+              onClick={
+                () =>
+                  // @ts-expect-error: Let's ignore a compile error
+                  document.getElementById("username_modal").showModal() // eslint-disable-line
               }
               className="cursor-pointer"
             >
