@@ -150,7 +150,7 @@ The app contains 4 api routes in total among which 3 are protectedProcedures(for
 
 ### Invite Members Flow
 For adding member to project, `email-id` is used. It creates new user with the given `email`, while `password` and `username` are set to null.
-Therefore the added user can sign in with their `email`, and create a password, which will lead to user `update`. After signing in, user can set their `username` from the dashboard.
+Therefore the added user can sign up with their `email`, and create a password, which will lead to user `update`. After signing in, user can set their `username` from the dashboard.
 
 ## Testing
 For testing [vitest](https://vitest.dev/) is being used.
